@@ -17,6 +17,12 @@ namespace GAMES.INFRASTRUCTURE.Repositories
             _collection = database.GetCollection<Games>(nameof(Games));
         }
 
+        // 👇 FIXED constructor for testing
+        public Repository(IMongoCollection<Games> collection)
+        {
+            _collection = collection;
+        }
+
         public async Task<IEnumerable<Games>> GetAllAsync() =>
             await _collection.Find(_ => true).ToListAsync();
 
@@ -40,8 +46,5 @@ namespace GAMES.INFRASTRUCTURE.Repositories
             var objectId = new ObjectId(id);
             await _collection.DeleteOneAsync(Builders<Games>.Filter.Eq("_id", objectId));
         }
-
-        //public async Task<IEnumerable<Games>> GetByPriceRangeAsync(decimal minPrice, decimal maxPrice) =>
-        //    await _collection.Find(g => g.Price >= minPrice && g.Price <= maxPrice).ToListAsync();
     }
 }

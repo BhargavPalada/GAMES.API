@@ -9,16 +9,20 @@ namespace First.API.Controllers
     [Route("[controller]")]
     public class GamesController : ControllerBase
     {
-        private readonly GameServices _gameServices;
+        private readonly IGamesServices _gameServices;
+        private readonly ILogger<GamesController> _logger;
 
-        public GamesController(GameServices gameServices)
+        public GamesController(ILogger<GamesController> logger, IGamesServices gameServices)
         {
-            _gameServices = gameServices;
+           _logger = logger;
+            _gameServices = (IGamesServices?)gameServices;
         }
+
 
         [HttpGet]
         public ActionResult<List<Games>> Get()
-        {
+        {   
+            _logger.LogCritical("Fetching all games");
             return _gameServices.Get();
         }
 

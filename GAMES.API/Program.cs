@@ -1,4 +1,5 @@
 using First.API.Services;
+using GAMES.CORE.Logger;
 using GAMES.CORE.Models;
 using MongoDB.Driver;
 
@@ -17,6 +18,12 @@ builder.Services.AddScoped<IGamesServices, GameServices>();
 
 // Add services to the container.
 builder.Services.AddControllers();
+builder.Services.AddLogging();
+builder.Logging.AddProvider(new SimpleFileLoggerProvider("Logs/log.txt"));
+
+
+
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
