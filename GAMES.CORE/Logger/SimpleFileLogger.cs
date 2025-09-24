@@ -22,7 +22,7 @@ namespace GAMES.CORE.Logger
         public IDisposable BeginScope<TState>(TState state) => null!;
 
         public bool IsEnabled(LogLevel logLevel) =>
-            logLevel >= LogLevel.Information;
+            logLevel >= LogLevel.Trace;
 
         public void Log<TState>(LogLevel logLevel, EventId eventId,
             TState state, Exception? exception, Func<TState, Exception?, string> formatter)

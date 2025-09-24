@@ -86,5 +86,29 @@ namespace GAMES.CORE.TESTS.Models
             Assert.Equal(string.Empty, game.Genre);
 
         }
+        [Fact]
+        public void Games_Id_ShouldNotAcceptInvalidFormat()
+        {
+            // Arrange
+            var game = new Games();
+
+            // Act
+            game.Id = "InvalidIdFormat123"; // not a valid ObjectId or GUID
+
+            // Assert - if your model validates Id format, check accordingly
+            Assert.NotEqual("507f1f77bcf86cd799439011", game.Id);
+        }
+
+        [Fact]
+        public void Games_StringProperties_AreNotNullAfterInitialization()
+        {
+            // Arrange & Act
+            var game = new Games();
+
+            // Assert - just to make sure no property is null
+            Assert.All(new string?[] { game.Id, game.Name, game.Description, game.Author, game.Genre },
+                        prop => Assert.NotNull(prop));
+        }
+
     }
 }

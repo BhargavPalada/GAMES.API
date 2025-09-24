@@ -42,7 +42,7 @@ namespace First.API.Tests
 
             _mockLogger.Verify(logger =>
                 logger.Log(
-                    LogLevel.Critical,
+                    LogLevel.Information,
                     It.IsAny<EventId>(),
                     It.Is<It.IsAnyType>((state, t) => state.ToString().Contains("Fetching all games")),
                     It.IsAny<Exception>(),

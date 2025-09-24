@@ -1,6 +1,8 @@
 ﻿using First.API.Models;
 using GAMES.CORE.Models;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using MongoDB.Bson;
 using MongoDB.Driver;
 
 namespace First.API.Services
@@ -8,19 +10,52 @@ namespace First.API.Services
     public class GameServices : IGamesServices
     {
         private readonly IMongoCollection<Games> _games;
+        private readonly ILogger<GameServices> _logger;
 
-        public GameServices(IOptions<GamesDBSettings> settings)
+        public GameServices(IOptions<GamesDBSettings> settings, ILogger<GameServices> logger)
         {
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+
             var client = new MongoClient(settings.Value.ConnectionString);
             var database = client.GetDatabase(settings.Value.DatabaseName);
             _games = database.GetCollection<Games>(settings.Value.GamesCollectionName);
         }
 
         public List<Games> Get() =>
-            _games.Find(game => true).ToList();
+            _games.FindSync(game => true).ToList();
 
-        public Games Get(string id) =>
-            _games.Find(game => game.Id == id).FirstOrDefault();
+        public Games? Get(string id)
+        {
+            if (string.IsNullOrWhiteSpace(id))
+            {
+                _logger.LogWarning("Attempted to fetch game with empty or null Id.");
+                return null;
+            }
+
+            try
+            {
+                if (!ObjectId.TryParse(id, out var objectId))
+                {
+                    _logger.LogWarning("Invalid ObjectId format provided: {Id}", id);
+                    return null;
+                }
+
+                var cursor = _games.FindSync(g => g.Id == id);
+                return cursor.FirstOrDefault();
+            }
+            //catch (MongoException ex)
+            //{
+            //    _logger.LogError(ex, "Failed to fetch game from database for Id {Id}", id);
+            //    throw new ApplicationException("Failed to fetch game from database.", ex);
+            //}
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to fetch game from database for Id {Id}", id);
+                throw new ApplicationException("Failed to fetch game from database.", ex);
+            }
+
+        }
+
 
         public Games Create(Games game)
         {

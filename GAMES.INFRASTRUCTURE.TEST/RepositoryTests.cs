@@ -93,5 +93,55 @@ namespace GAMES.INFRASTRUCTURE.Tests
             Assert.Equal(expectedGame.Id, result.Id);
             Assert.Equal(expectedGame.Name, result.Name);
         }
+
+        [Fact]
+        public async Task CreateAsync_Should_Throw_If_Null_Game()
+        {
+            await Assert.ThrowsAsync<System.ArgumentNullException>(() => _repository.CreateAsync(null));
+        }
+
+        [Fact]
+        public async Task UpdateAsync_Should_Handle_NonExistent_Game()
+        {
+            var id = ObjectId.GenerateNewId().ToString();
+            var game = new Games { Id = id, Name = "NonExistent" };
+
+            _mockCollection.Setup(c => c.ReplaceOneAsync(
+                It.IsAny<FilterDefinition<Games>>(),
+                game,
+                It.IsAny<ReplaceOptions>(),
+                It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new ReplaceOneResult.Acknowledged(0, 0, ObjectId.GenerateNewId())); // Simulate no match
+
+            _mockCollection.Verify(c => c.ReplaceOneAsync(
+    It.IsAny<FilterDefinition<Games>>(),
+    game,
+    It.IsAny<ReplaceOptions>(),
+    It.IsAny<CancellationToken>()), Times.Once);
+
+        }
+
+
+
+        [Fact]
+        public async Task GetByIdAsync_Should_Return_Null_For_NonExistent_Id()
+        {
+            var id = ObjectId.GenerateNewId().ToString();
+
+            var mockCursor = new Mock<IAsyncCursor<Games>>();
+            mockCursor.SetupSequence(c => c.MoveNextAsync(It.IsAny<CancellationToken>())).ReturnsAsync(false); // No data
+            mockCursor.SetupGet(c => c.Current).Returns(new List<Games>());
+
+            _mockCollection.Setup(c => c.FindAsync(
+                It.IsAny<FilterDefinition<Games>>(),
+                It.IsAny<FindOptions<Games, Games>>(),
+                It.IsAny<CancellationToken>()))
+                .ReturnsAsync(mockCursor.Object);
+
+            var result = await _repository.GetByIdAsync(id);
+
+            Assert.Null(result);
+        }
+
     }
 }
