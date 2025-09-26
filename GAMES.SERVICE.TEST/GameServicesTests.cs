@@ -101,7 +101,7 @@ namespace GAMES.SERVICE.TESTS.Services
             Assert.Equal(expectedGame.Name, result.Name);
         }
 
-        // Optional: Mock insertion test
+        
         [Fact]
         public void Create_ShouldInsertGame()
         {
@@ -163,7 +163,7 @@ namespace GAMES.SERVICE.TESTS.Services
         private class TestableGameServices : GameServices
         {
             public TestableGameServices(IOptions<GamesDBSettings> settings, IMongoClient client, ILogger<GameServices> logger)
-                : base(settings, logger)
+                : base(settings, client, logger)
             {
                 var database = client.GetDatabase(settings.Value.DatabaseName);
                 typeof(GameServices)

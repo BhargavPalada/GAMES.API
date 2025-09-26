@@ -12,13 +12,11 @@ namespace First.API.Services
         private readonly IMongoCollection<Games> _games;
         private readonly ILogger<GameServices> _logger;
 
-        public GameServices(IOptions<GamesDBSettings> settings, ILogger<GameServices> logger)
+        public GameServices(IOptions<GamesDBSettings> gamesDBSettings, IMongoClient mongoClient, ILogger<GameServices> logger)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-
-            var client = new MongoClient(settings.Value.ConnectionString);
-            var database = client.GetDatabase(settings.Value.DatabaseName);
-            _games = database.GetCollection<Games>(settings.Value.GamesCollectionName);
+            var gamesDatabase = mongoClient.GetDatabase(gamesDBSettings.Value.DatabaseName);
+            _games = gamesDatabase.GetCollection<Games>(gamesDBSettings.Value.GamesCollectionName);
         }
 
         public List<Games> Get() =>

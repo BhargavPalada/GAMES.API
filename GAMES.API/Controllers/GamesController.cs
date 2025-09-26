@@ -1,11 +1,13 @@
 ﻿using First.API.Models;
 using First.API.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace First.API.Controllers
 {
     [ApiController]
     [Route("[controller]")]
+    [Microsoft.AspNetCore.Authorization.Authorize]
     public class GamesController : ControllerBase
     {
         private readonly IGamesServices _gameServices;
@@ -18,6 +20,7 @@ namespace First.API.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "Admin,User")]
         public ActionResult<List<Games>> Get()
         {
             _logger.LogInformation("Fetching all games from the database.");

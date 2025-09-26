@@ -17,7 +17,7 @@ namespace GAMES.INFRASTRUCTURE.Repositories
             _collection = database.GetCollection<Games>(nameof(Games));
         }
 
-        // 👇 FIXED constructor for testing
+        
         public Repository(IMongoCollection<Games> collection)
         {
             _collection = collection;
@@ -32,8 +32,15 @@ namespace GAMES.INFRASTRUCTURE.Repositories
             return await _collection.Find(Builders<Games>.Filter.Eq("_id", objectId)).FirstOrDefaultAsync();
         }
 
-        public async Task CreateAsync(Games entity) =>
+        public async Task CreateAsync(Games entity)
+        {
+            if (entity == null)
+            {
+                throw new ArgumentNullException(nameof(entity), "Game entity cannot be null");
+            }
+
             await _collection.InsertOneAsync(entity);
+        }
 
         public async Task UpdateAsync(string id, Games entity)
         {

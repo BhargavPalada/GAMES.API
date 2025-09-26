@@ -97,7 +97,7 @@ namespace GAMES.INFRASTRUCTURE.Tests
         [Fact]
         public async Task CreateAsync_Should_Throw_If_Null_Game()
         {
-            await Assert.ThrowsAsync<System.ArgumentNullException>(() => _repository.CreateAsync(null));
+            await Assert.ThrowsAsync<System.ArgumentNullException>(() => _repository.CreateAsync((Games)null!));
         }
 
         [Fact]
@@ -113,12 +113,13 @@ namespace GAMES.INFRASTRUCTURE.Tests
                 It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new ReplaceOneResult.Acknowledged(0, 0, ObjectId.GenerateNewId())); // Simulate no match
 
-            _mockCollection.Verify(c => c.ReplaceOneAsync(
-    It.IsAny<FilterDefinition<Games>>(),
-    game,
-    It.IsAny<ReplaceOptions>(),
-    It.IsAny<CancellationToken>()), Times.Once);
+            await _repository.UpdateAsync(id, game);
 
+            _mockCollection.Verify(c => c.ReplaceOneAsync(
+                It.IsAny<FilterDefinition<Games>>(),
+                game,
+                It.IsAny<ReplaceOptions>(),
+                It.IsAny<CancellationToken>()), Times.Once);
         }
 
 
