@@ -5,6 +5,8 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace GAMES.SERVICE.JWTServices
 {
@@ -29,16 +31,28 @@ namespace GAMES.SERVICE.JWTServices
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
-            var claims = new[]
+            // Build a mutable list of claims so we can add one role claim per role string
+            var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.NameIdentifier, user.Id ?? user.Username),
                 new Claim(ClaimTypes.Name, user.Username),
-                new Claim(ClaimTypes.Role, user.Role),
                 new Claim(ClaimTypes.Email, user.Email ?? ""),
                 new Claim(JwtRegisteredClaimNames.Sub, user.Username),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                 new Claim(JwtRegisteredClaimNames.Iat, DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString())
             };
+
+            // Use the correct property name "Roles" and split by comma for multiple roles
+            if (!string.IsNullOrWhiteSpace(user.Roles))
+            {
+                var roles = user.Roles
+                    .Split(',', StringSplitOptions.RemoveEmptyEntries)
+                    .Select(r => r.Trim())
+                    .Where(r => !string.IsNullOrWhiteSpace(r));
+
+                foreach (var role in roles)
+                    claims.Add(new Claim(ClaimTypes.Role, role));
+            }
 
             var token = new JwtSecurityToken(
                 issuer: jwtIssuer,
@@ -77,11 +91,14 @@ namespace GAMES.SERVICE.JWTServices
 
         public LoginResponseModel CreateLoginResponse(UserModel user, string token)
         {
+            // Keep response compatible with LoginResponseModel which exposes "Roles" (string)
+            var rolesString = user.Roles ?? string.Empty;
+
             return new LoginResponseModel
             {
                 UserName = user.Username,
                 AccessToken = token,
-                Role = user.Role,
+                Roles = rolesString,
                 ExpiresAt = DateTime.UtcNow.AddHours(1),
                 ExpiresIn = 3600
             };

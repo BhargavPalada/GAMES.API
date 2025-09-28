@@ -21,10 +21,10 @@ namespace GAMES.CORE.LoginDetails
         [StringLength(255, ErrorMessage = "Password can't be longer than 255 characters")]
         public string Password { get; set; } = string.Empty;
 
-        [BsonElement("Role")]
+        [BsonElement("Roles")]
         [Required(ErrorMessage = "Role is required")]
         [StringLength(20, ErrorMessage = "Role can't be longer than 20 characters")]
-        public string Role { get; set; } = "User";   // default User role
+        public string Roles { get; set; }   // default User role
 
         [BsonElement("Email")]
         [Required(ErrorMessage = "Email is required")]

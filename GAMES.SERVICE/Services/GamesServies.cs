@@ -41,11 +41,6 @@ namespace First.API.Services
                 var cursor = _games.FindSync(g => g.Id == id);
                 return cursor.FirstOrDefault();
             }
-            //catch (MongoException ex)
-            //{
-            //    _logger.LogError(ex, "Failed to fetch game from database for Id {Id}", id);
-            //    throw new ApplicationException("Failed to fetch game from database.", ex);
-            //}
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Failed to fetch game from database for Id {Id}", id);

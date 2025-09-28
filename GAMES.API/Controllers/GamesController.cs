@@ -7,7 +7,7 @@ namespace First.API.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    [Microsoft.AspNetCore.Authorization.Authorize]
+    //[Authorize(Roles = "Admin")] // Only Admin can access all by default
     public class GamesController : ControllerBase
     {
         private readonly IGamesServices _gameServices;
@@ -20,7 +20,7 @@ namespace First.API.Controllers
         }
 
         [HttpGet]
-        [Authorize(Roles = "Admin,User")]
+        [Authorize(Roles = "Admin, Readonly, Moderator")] // Both Admin and Readonly can access GET all
         public ActionResult<List<Games>> Get()
         {
             _logger.LogInformation("Fetching all games from the database.");
@@ -37,6 +37,7 @@ namespace First.API.Controllers
         }
 
         [HttpGet("{id:length(24)}", Name = "GetGame")]
+        [Authorize(Roles = "Admin, Readonly, Moderator")] // Both Admin and Readonly can access GET by id
         public ActionResult<Games> Get(string id)
         {
             _logger.LogInformation("Fetching game with ID: {GameId}", id);
@@ -54,6 +55,9 @@ namespace First.API.Controllers
         }
 
         [HttpPost]
+        // Only Admin (inherited from class-level [Authorize])
+        [Authorize(Roles = "Admin, Moderator")] 
+
         public ActionResult<Games> Create(Games game)
         {
             _logger.LogInformation("Creating a new game: {GameName}", game.Name);
@@ -65,6 +69,8 @@ namespace First.API.Controllers
         }
 
         [HttpPut("{id:length(24)}")]
+        // Only Admin (inherited from class-level [Authorize])
+        [Authorize(Roles = "Admin")]
         public IActionResult Update(string id, Games gameIn)
         {
             _logger.LogInformation("Updating game with ID: {GameId}", id);
@@ -84,6 +90,9 @@ namespace First.API.Controllers
         }
 
         [HttpDelete("{id:length(24)}")]
+        // Only Admin (inherited from class-level [Authorize])
+        [Authorize(Roles = "Admin")]
+
         public IActionResult Delete(string id)
         {
             _logger.LogInformation("Attempting to delete game with ID: {GameId}", id);

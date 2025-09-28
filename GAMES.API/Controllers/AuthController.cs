@@ -58,9 +58,6 @@ namespace First.API.Controllers
 
                 var createdUser = await _userService.CreateUser(userModel);
 
-                // Remove password before returning
-                //createdUser.Password = null;
-
                 return Ok(new
                 {
                     message = "User registered successfully",
@@ -92,7 +89,7 @@ namespace First.API.Controllers
         }
 
         [HttpGet("profile")]
-        [Authorize]
+        [Authorize(Roles ="Admin,Readonly,Moderator")]
         public async Task<IActionResult> GetProfile()
         {
             var username = User?.Identity?.Name;
