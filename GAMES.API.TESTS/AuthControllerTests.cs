@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using GAMES.CORE.LoginDetails;
@@ -31,9 +31,9 @@ namespace GAMES.API.TESTS
         public async Task Login_Positive_ReturnsOkWithToken()
         {
             var login = new LoginRequestModel { UserName = "user", Password = "pass" };
-            var user = new UserModel { Username = "user", Password = "hashed", Role = "User", Email = "user@email.com" };
+            var user = new UserModel { Username = "user", Password = "hashed", Roles = "User", Email = "user@email.com" };
             var token = "jwt-token";
-            var response = new LoginResponseModel { UserName = "user", AccessToken = token, Role = "User", ExpiresAt = DateTime.UtcNow.AddHours(1), ExpiresIn = 3600 };
+            var response = new LoginResponseModel { UserName = "user", AccessToken = token, Roles = "User", ExpiresAt = DateTime.UtcNow.AddHours(1), ExpiresIn = 3600 };
 
             _mockUserService.Setup(s => s.AuthenticateUser(login.UserName, login.Password)).ReturnsAsync(user);
             _mockJwtService.Setup(s => s.GenerateToken(user)).Returns(token);
@@ -72,8 +72,8 @@ namespace GAMES.API.TESTS
         [Fact]
         public async Task Register_Positive_ReturnsOkWithUser()
         {
-            var userModel = new UserModel { Username = "newuser", Password = "pass", Role = "User", Email = "new@email.com" };
-            var createdUser = new UserModel { Username = "newuser", Password = "", Role = "User", Email = "new@email.com" };
+            var userModel = new UserModel { Username = "newuser", Password = "pass", Roles = "User", Email = "new@email.com" };
+            var createdUser = new UserModel { Username = "newuser", Password = "", Roles = "User", Email = "new@email.com" };
 
             _mockUserService.Setup(s => s.CreateUser(userModel)).ReturnsAsync(createdUser);
 
@@ -146,7 +146,7 @@ namespace GAMES.API.TESTS
         public async Task GetProfile_Positive_ReturnsOkWithUser()
         {
             var username = "user";
-            var user = new UserModel { Username = username, Password = "pass", Role = "User", Email = "user@email.com" };
+            var user = new UserModel { Username = username, Password = "pass", Roles = "User", Email = "user@email.com" };
             _mockUserService.Setup(s => s.GetUserByUsername(username)).ReturnsAsync(user);
 
             var controller = _controller;
