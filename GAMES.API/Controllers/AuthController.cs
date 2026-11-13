@@ -1,5 +1,4 @@
 ﻿using GAMES.CORE.LoginDetails;
-using GAMES.CORE.Models;
 using GAMES.SERVICE.JWTServices;
 using GAMES.SERVICE.UserServices;
 using Microsoft.AspNetCore.Authorization;
